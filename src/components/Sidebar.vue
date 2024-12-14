@@ -24,6 +24,7 @@ export default {
 
 <style scoped>
 .sidebar {
+  position: absolute;
   display: flex;
   flex-direction: column;
   width: 120px;

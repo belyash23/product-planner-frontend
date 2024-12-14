@@ -1,9 +1,9 @@
 <script setup>
-import TheWelcome from '@/components/TheWelcome.vue'
+import ForecastsTable from "@/components/ForecastsTable.vue";
 </script>
 
 <template>
   <main>
-    <TheWelcome />
+    <ForecastsTable />
   </main>
 </template>

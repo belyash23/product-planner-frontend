@@ -5,6 +5,7 @@ import Sidebar from '@/components/Sidebar.vue';
 
 <template>
   <Sidebar></Sidebar>
+  <RouterView></RouterView>
 </template>
 
 <style>
@@ -13,5 +14,8 @@ import Sidebar from '@/components/Sidebar.vue';
 a {
   text-decoration: none;
   color: var(--color-text);
+}
+main {
+  margin-left: 120px;
 }
 </style>
