@@ -32,26 +32,37 @@
     </tr>
   </tbody>
 </table>
+  <transition name="modal">
+    <ModalWindow v-if="showViewModal" @close="showViewModal = false">
+      <template v-slot:header>
+        <h3>Скважины</h3>
+      </template>
+      <template v-slot:body>
+        <ForecastWells :forecast-id="chosenForecast"></ForecastWells>
+      </template>
+    </ModalWindow>
+  </transition>
 </template>
 
 <script>
 
 import {useForecastsStore} from "@/stores/forecasts";
+import ModalWindow from "@/components/ModalWindow.vue";
+import ForecastWells from "@/components/ForecastWells.vue";
+import {getFormattedDate} from "@/helpers/dateHelper";
 
 export default {
   name: "ForecastsTable",
+  components: {ModalWindow, ForecastWells},
   data() {
     return {
       forecastsStore: useForecastsStore(),
       forecasts: [],
+      showViewModal: false,
+      chosenForecast: null,
     }
   },
   methods: {
-    getFormattedDate(dateString) {
-      const date = new Date(Date.parse(dateString));
-
-      return `${date.getDate()}.${date.getMonth()}.${date.getFullYear()}`;
-    },
     copy(id) {
       this.forecastsStore.copy(id);
     },
@@ -61,7 +72,8 @@ export default {
       }
     },
     viewForecast(id) {
-
+      this.chosenForecast = id;
+      this.showViewModal = true;
     },
   },
   computed: {
@@ -72,8 +84,8 @@ export default {
           id: forecast.forecastId,
           name: forecast.label,
           comment: forecast.comment,
-          createdAt: this.getFormattedDate(forecast.createdAt),
-          updatedAt: this.getFormattedDate(forecast.lastModificationTime),
+          createdAt: getFormattedDate(forecast.createdAt),
+          updatedAt: getFormattedDate(forecast.lastModificationTime),
         });
       });
 
@@ -127,7 +139,7 @@ td {
 
 .action-button svg {
   fill: #666666;
-  transition: .5s;
+  transition: .2s;
 }
 
 .action-button :hover {
