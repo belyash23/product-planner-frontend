@@ -1,7 +1,7 @@
 <template>
   <div class="modal-mask">
     <div class="modal-wrapper">
-      <div class="modal-container">
+      <div class="modal-container" :style="{width: width}">
 
         <div class="modal-header">
           <slot name="header">
@@ -21,6 +21,9 @@
 <script>
 export default {
   name: "ModalWindow",
+  props: {
+    width: false,
+  },
   data() {
     return {
       showModal: false

@@ -15,8 +15,24 @@ export const useForecastsStore = defineStore('forecasts', {
         this.forecasts = data.data;
       });
     },
-    async copy(id) {
-
+    async copy(id, name) {
+      let newForecast = {}
+      this.forecasts.forEach(forecast => {
+        if (forecast.forecastId === id) {
+          newForecast = Object.assign({}, forecast);
+          newForecast.label = name;
+          return fetch(`/api/forecasts/${id}/copy`, {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            method: 'POST',
+            body: JSON.stringify(newForecast),
+          }).then(response => {
+            console.log(newForecast);
+            this.forecasts.push(newForecast);
+          });
+        }
+      })
     },
     async delete(id) {
       return fetch(`/api/forecasts/${id}`, {

@@ -21,7 +21,7 @@
   </table>
 
   <transition name="modal-charts">
-    <ModalWindow v-if="showChartsModal" @close="showChartsModal = false">
+    <ModalWindow v-if="showChartsModal" @close="showChartsModal = false" :width="'1200px'">
       <template v-slot:header>
         <h3>Данные скважины {{chosenWell.number}}</h3>
       </template>
