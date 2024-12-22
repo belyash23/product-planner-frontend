@@ -9,7 +9,7 @@ export const useForecastsStore = defineStore('forecasts', {
 
   actions: {
     async fetch() {
-      return fetch(`/api/forecasts`).then(response => {
+      return fetch(`${import.meta.env.VITE_BACKEND_URL}/api/forecasts`).then(response => {
         return response.json();
       }).then(data => {
         this.forecasts = data.data;
@@ -21,7 +21,7 @@ export const useForecastsStore = defineStore('forecasts', {
         if (forecast.forecastId === id) {
           newForecast = Object.assign({}, forecast);
           newForecast.label = name;
-          return fetch(`/api/forecasts/${id}/copy`, {
+          return fetch(`${import.meta.env.VITE_BACKEND_URL}/api/forecasts/${id}/copy`, {
             headers: {
               'Content-Type': 'application/json',
             },
@@ -35,7 +35,7 @@ export const useForecastsStore = defineStore('forecasts', {
       })
     },
     async delete(id) {
-      return fetch(`/api/forecasts/${id}`, {
+      return fetch(`${import.meta.env.VITE_BACKEND_URL}/api/forecasts/${id}`, {
         method: 'DELETE',
       }).then(response => {
         return response.json();
