@@ -9,7 +9,7 @@ export const useWellsStore = defineStore('wells', {
 
   actions: {
     async fetch(forecastId) {
-      return fetch(`${import.meta.env.VITE_BACKEND_URL}/api/forecast/${forecastId}/wellObjects`).then(response => {
+      return fetch(`${import.meta.env.VITE_BACKEND_URL}/forecast/${forecastId}/wellObjects`).then(response => {
         return response.json();
       }).then(data => {
         this.wells[forecastId] = data.data;
@@ -17,7 +17,7 @@ export const useWellsStore = defineStore('wells', {
     },
 
     async getWellData(forecastId, wellId) {
-      return fetch(`${import.meta.env.VITE_BACKEND_URL}/api/forecast/${forecastId}/${wellId}`).then(response => {
+      return fetch(`${import.meta.env.VITE_BACKEND_URL}/forecast/${forecastId}/${wellId}`).then(response => {
         return response.json();
       }).then(data => {
         this.wells[forecastId].forEach(well => {
