@@ -10,13 +10,16 @@
     </tr>
     </thead>
     <tbody>
-    <tr v-for="well in formattedWells" @click="showCharts(well)">
+    <RouterLink class="well" v-for="well in formattedWells" :to="{
+           name: `well`,
+           params: {forecastId: forecastId, wellId: well.id},
+         }">
       <td>{{well.startDate}}</td>
       <td>{{well.startOil}}</td>
       <td>{{well.field}}</td>
       <td>{{well.startFluid}}</td>
       <td>{{well.number}}</td>
-    </tr>
+    </RouterLink>
     </tbody>
   </table>
 
@@ -106,12 +109,13 @@ td {
   text-align: center;
 }
 
-tr {
+.well {
+  display: table-row;
   border-bottom: solid 1px #cccccc;
   cursor: pointer;
 }
 
-tr:hover {
+.well:hover {
   background: #cccccc;
   transition: .5s;
 }
@@ -120,7 +124,7 @@ thead tr:hover {
   background: #1A82E3;
 }
 
-tr:last-child{
+.well:last-child{
   border-bottom: none;
 }
 </style>

@@ -9,7 +9,7 @@ export const useWellsStore = defineStore('wells', {
 
   actions: {
     async fetch(forecastId) {
-      return fetch(`/api/forecast/${forecastId}/wellObjects`).then(response => {
+      return fetch(`${import.meta.env.VITE_BACKEND_URL}/forecast/${forecastId}/wellObjects`).then(response => {
         return response.json();
       }).then(data => {
         this.wells[forecastId] = data.data;
@@ -17,15 +17,35 @@ export const useWellsStore = defineStore('wells', {
     },
 
     async getWellData(forecastId, wellId) {
-      return fetch(`/api/forecast/${forecastId}/${wellId}`).then(response => {
+      return fetch(`${import.meta.env.VITE_BACKEND_URL}/forecast/${forecastId}/${wellId}`).then(response => {
         return response.json();
       }).then(data => {
         this.wells[forecastId].forEach(well => {
           if (well.DocumentId === wellId) {
-            well.indicators = data.data.indicators;
+            well.data = data.data;
           }
         })
       });
-    }
+    },
+
+    async saveAttributes(forecastId, wellId, newData) {
+      newData = JSON.parse(JSON.stringify(newData));
+      newData.forEach(attribute => {
+        if (attribute.type === 'Number') {
+          attribute.value = attribute.value.toString();
+        }
+        delete attribute.type;
+      })
+
+      return fetch(`${import.meta.env.VITE_BACKEND_URL}/forecast/${forecastId}/${wellId}/editAttributes`, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        method: 'PUT',
+        body: JSON.stringify(newData),
+      }).then(response => {
+        return response.json()
+      });
+    },
   }
 })

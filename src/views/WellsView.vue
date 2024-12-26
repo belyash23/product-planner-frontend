@@ -1,10 +1,11 @@
 <template>
-
 </template>
 
 <script>
+
 export default {
-  name: "WellsView"
+  name: "WellsView",
+  components: {}
 }
 </script>
 

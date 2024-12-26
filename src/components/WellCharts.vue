@@ -16,12 +16,11 @@ export default {
   components: {LinearChart},
   props: {
     forecastId: Number,
-    wellId: String
+    wellId: String,
+    indicators: Array,
   },
   data() {
     return {
-      wellsStore: useWellsStore(),
-      indicators: [],
       chartsData: {},
     }
   },
@@ -43,23 +42,14 @@ export default {
       this.chartsData = chartsData;
     }
   },
-  created() {
-    this.wellsStore.wells[this.forecastId].forEach(well => {
-      if (well.DocumentId === this.wellId) {
-        this.indicators = well.indicators;
+  watch: {
+    indicators: {
+      handler() {
         this.updateChartsData();
-      }
-    });
-
-    this.wellsStore.getWellData(this.forecastId, this.wellId).then(() => {
-      this.wellsStore.wells[this.forecastId].forEach(well => {
-        if (well.DocumentId === this.wellId) {
-          this.indicators = well.indicators;
-          this.updateChartsData();
-        }
-      });
-    });
-  }
+      },
+      immediate: true,
+    },
+  },
 }
 </script>
 
