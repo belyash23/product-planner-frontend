@@ -55,10 +55,25 @@ export const useWellsStore = defineStore('wells', {
         },
         method: 'POST',
         body: JSON.stringify({
-          'documentsIds': wellsIds,
+          documentsIds: wellsIds,
         }),
       }).then(response => {
         return response.json();
+      });
+    },
+
+    async getSchedule(forecastId, wellsIds) {
+      return fetch(`${import.meta.env.VITE_BACKEND_URL}/export/wellSchedule`, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        method: 'POST',
+        body: JSON.stringify({
+          forecastId: forecastId,
+          documentsIds: wellsIds,
+        }),
+      }).then(response => {
+        return response.blob();
       });
     }
   }

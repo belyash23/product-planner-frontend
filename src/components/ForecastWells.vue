@@ -3,7 +3,15 @@
     <thead>
     <tr>
       <th style="width:5%"><input type="checkbox" @click="checkAllWells()" :checked="chosenWells.length === formattedWells.length"></th>
-      <th style="width:8%" class="calc-button" @click="calc()">Рассчитать <svg v-if="load" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><radialGradient id="a6" cx=".66" fx=".66" cy=".3125" fy=".3125" gradientTransform="scale(1.5)"><stop offset="0" stop-color="#FFFFFF"></stop><stop offset=".3" stop-color="#FFFFFF" stop-opacity=".9"></stop><stop offset=".6" stop-color="#FFFFFF" stop-opacity=".6"></stop><stop offset=".8" stop-color="#FFFFFF" stop-opacity=".3"></stop><stop offset="1" stop-color="#FFFFFF" stop-opacity="0"></stop></radialGradient><circle transform-origin="center" fill="none" stroke="url(#a6)" stroke-width="15" stroke-linecap="round" stroke-dasharray="200 1000" stroke-dashoffset="0" cx="100" cy="100" r="70"><animateTransform type="rotate" attributeName="transform" calcMode="spline" dur="2" values="360;0" keyTimes="0;1" keySplines="0 0 1 1" repeatCount="indefinite"></animateTransform></circle><circle transform-origin="center" fill="none" opacity=".2" stroke="#FFFFFF" stroke-width="15" stroke-linecap="round" cx="100" cy="100" r="70"></circle></svg></th>
+      <th style="width:8%" @click="contextMenuOpened=!contextMenuOpened" :class="{'context-menu-button': true, 'active': contextMenuOpened}">
+        <p class="context-menu-title">Выбрано: {{chosenWells.length}}</p>
+        <svg v-if="load" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><radialGradient id="a6" cx=".66" fx=".66" cy=".3125" fy=".3125" gradientTransform="scale(1.5)"><stop offset="0" stop-color="#FFFFFF"></stop><stop offset=".3" stop-color="#FFFFFF" stop-opacity=".9"></stop><stop offset=".6" stop-color="#FFFFFF" stop-opacity=".6"></stop><stop offset=".8" stop-color="#FFFFFF" stop-opacity=".3"></stop><stop offset="1" stop-color="#FFFFFF" stop-opacity="0"></stop></radialGradient><circle transform-origin="center" fill="none" stroke="url(#a6)" stroke-width="15" stroke-linecap="round" stroke-dasharray="200 1000" stroke-dashoffset="0" cx="100" cy="100" r="70"><animateTransform type="rotate" attributeName="transform" calcMode="spline" dur="2" values="360;0" keyTimes="0;1" keySplines="0 0 1 1" repeatCount="indefinite"></animateTransform></circle><circle transform-origin="center" fill="none" opacity=".2" stroke="#FFFFFF" stroke-width="15" stroke-linecap="round" cx="100" cy="100" r="70"></circle></svg>
+        <div class="context-menu" v-show="contextMenuOpened">
+          <div class="context-menu__item" @click="calc()">Рассчитать</div>
+          <div class="context-menu__item"  @click="download()">Выгрузить</div>
+        </div>
+      </th>
+
       <th>Дата ввода</th>
       <th>Стартовый дебит нефти</th>
       <th>Месторождение</th>
@@ -26,17 +34,7 @@
     </RouterLink>
     </tbody>
   </table>
-
-  <transition name="modal-charts">
-    <ModalWindow v-if="showChartsModal" @close="showChartsModal = false" :width="'1200px'">
-      <template v-slot:header>
-        <h3>Данные скважины {{chosenWell.number}}</h3>
-      </template>
-      <template v-slot:body>
-        <WellCharts :forecast-id="forecastId" :well-id="chosenWell.id"></WellCharts>
-      </template>
-    </ModalWindow>
-  </transition>
+  <a :href="blobUrl" ref="download-button"></a>
 </template>
 
 <script>
@@ -59,6 +57,8 @@ export default {
       chosenWell: {},
       chosenWells: [],
       load: false,
+      contextMenuOpened: false,
+      blobUrl: '#',
     }
   },
   computed: {
@@ -108,6 +108,15 @@ export default {
         this.load = false;
       }.bind(this));
 
+    },
+    download() {
+      const chosenWellsIds = this.chosenWells.map(item => item.id);
+      this.wellsStore.getSchedule(this.forecastId, chosenWellsIds).then(blob => {
+        this.blobUrl = URL.createObjectURL(blob);
+        setTimeout(function () {
+          this.$refs["download-button"].click();
+        }.bind(this));
+      });
     }
   },
   mounted() {
@@ -165,15 +174,55 @@ input {
   height: 100%;
 }
 
-.calc-button {
+.context-menu-button {
   cursor: pointer;
   transition: .5s;
 }
-.calc-button:hover {
+.context-menu-button:hover, .context-menu-button.active {
   background: #2371d1;
 }
 
-.calc-button svg {
+.context-menu-title {
+  display: inline;
+}
+
+.context-menu {
+  position: absolute;
+  background: #dddddd;
+  left: 0;
+  z-index: 9990;
+  cursor: default;
+  width: 100%;
+  padding-left: 5px;
+  margin-top: 10px;
+}
+
+.context-menu__item {
+  color: var(--color-text);
+  cursor: pointer;
+  position: relative;
+  margin-bottom: 5px;
+}
+
+.context-menu__item::before {
+  content: "";
+  position: absolute;
+  display: block;
+  width: 90%;
+  height: 1px;
+  bottom: 0;
+  left: 5%;
+  background-color: #000;
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+  margin-top: 1px;
+}
+
+.context-menu__item:hover::before {
+  transform: scaleX(1);
+}
+
+.context-menu-button svg {
   width: 20px;
   margin-bottom: -5px;
   margin-left: 5px;
