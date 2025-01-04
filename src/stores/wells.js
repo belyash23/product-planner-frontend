@@ -47,5 +47,19 @@ export const useWellsStore = defineStore('wells', {
         return response.json()
       });
     },
+
+    async calc(forecastId, wellsIds) {
+      return fetch(`${import.meta.env.VITE_BACKEND_URL}/forecast/${forecastId}/calc`, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        method: 'POST',
+        body: JSON.stringify({
+          'documentsIds': wellsIds,
+        }),
+      }).then(response => {
+        return response.json();
+      });
+    }
   }
 })

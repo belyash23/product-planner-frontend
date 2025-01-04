@@ -2,18 +2,11 @@
 <table>
   <thead>
     <tr>
-      <th style="width:5%"><input type="checkbox" @click="checkAllForecasts()" :checked="chosenForecasts.length === preparedForecasts.length"></th>
-      <th style="width:10%" @click="contextMenuOpened=!contextMenuOpened" :class="{'context-menu-button': true, 'active': contextMenuOpened}">
-        <p class="context-menu-title">Выбрано: {{chosenForecasts.length}}</p>
-        <div class="context-menu" v-if="contextMenuOpened">
-          <div class="context-menu__item" v-if="chosenForecasts.length === 1" @click="copy()">Скопировать</div>
-          <div class="context-menu__item" v-if="chosenForecasts.length === 1" @click="deleteForecast(chosenForecasts[0].id)">Удалить</div>
-        </div>
-      </th>
       <th>Название</th>
       <th>Комментарий</th>
       <th>Дата создания</th>
       <th>Дата изменения</th>
+      <th></th>
     </tr>
   </thead>
   <tbody>
@@ -22,23 +15,26 @@
            name: `forecast-wells`,
            params: {forecastId: forecast.id},
          }">
-        <td><input type="checkbox" v-model="forecast.checked" @change="updateChosenForecasts()" @click.stop></td>
-        <td></td>
-        <td>{{forecast.name}}</td>
-        <td>{{forecast.comment}}</td>
-        <td>{{forecast.createdAt}}</td>
-        <td>{{forecast.updatedAt}}</td>
+          <td>{{forecast.name}}</td>
+          <td>{{forecast.comment}}</td>
+          <td>{{forecast.createdAt}}</td>
+          <td>{{forecast.updatedAt}}</td>
+          <td class="actions" @click.stop.prevent="showContext(forecast.id, $event)"><p>...</p></td>
         </RouterLink>
       </template>
   </tbody>
 </table>
+  <div class="context-menu" v-show="contextMenuOpened" ref="context-menu" :style="{top: contextMenuOffsetY + 'px', left: contextMenuOffsetX + 'px'}">
+    <div class="context-menu__item" @click="copy()">Скопировать</div>
+    <div class="context-menu__item" @click="deleteForecast(chosenForecast.id)">Удалить</div>
+  </div>
   <transition name="copy-modal">
   <ModalWindow v-if="showCopyModal" @close="showCopyModal = false" :width="'400px'">
     <template v-slot:header>
-      <h3>Копирование прогноза {{ chosenForecasts[0]?.name }}</h3>
+      <h3>Копирование прогноза {{ chosenForecast.name }}</h3>
     </template>
     <template v-slot:body>
-      <CopyForecast :forecast-id="chosenForecasts[0]?.id"></CopyForecast>
+      <CopyForecast :forecast-id="chosenForecast.id"></CopyForecast>
     </template>
   </ModalWindow>
   </transition>
@@ -52,6 +48,7 @@ import ForecastWells from "@/components/ForecastWells.vue";
 import {getFormattedDate} from "@/helpers/dateHelper";
 import CopyForecast from "@/components/CopyForecast.vue";
 
+
 export default {
   name: "ForecastsTable",
   components: {CopyForecast, ModalWindow, ForecastWells},
@@ -61,7 +58,11 @@ export default {
       forecasts: [],
       showCopyModal: false,
       chosenForecasts: [],
+      chosenForecast: {},
       contextMenuOpened: false,
+      contextMenuOpenedRecently: false,
+      contextMenuOffsetX: 0,
+      contextMenuOffsetY: 0,
     }
   },
   methods: {
@@ -74,20 +75,21 @@ export default {
       }
     },
     updateChosenForecasts() {
-      console.log(this.preparedForecasts);
       this.chosenForecasts = this.preparedForecasts.filter(forecast => forecast.checked);
     },
-    checkAllForecasts() {
-      let checkedValue = true;
-      if (this.chosenForecasts.length === this.preparedForecasts.length) {
-        checkedValue = false;
-      }
-      this.preparedForecasts.map(forecast => {
-        forecast.checked = checkedValue;
-      })
-
-      this.updateChosenForecasts()
-    }
+    showContext(forecastId, e)
+    {
+      window.e = e;
+      this.chosenForecast = this.preparedForecasts.filter(forecast => forecast.id === forecastId)[0];
+      this.contextMenuOffsetX = e.clientX - 120 - 110;
+      this.contextMenuOffsetY = e.clientY;
+      this.contextMenuOpened = !this.contextMenuOpened;
+    },
+    closeContext()
+    {
+      this.chosenForecast = {}
+      this.contextMenuOpened = false;
+    },
   },
   computed: {
     preparedForecasts() {
@@ -99,7 +101,6 @@ export default {
           comment: forecast.comment,
           createdAt: getFormattedDate(forecast.createdAt),
           updatedAt: getFormattedDate(forecast.lastModificationTime),
-          checked: false,
         });
       });
 
@@ -110,6 +111,12 @@ export default {
     this.forecastsStore.fetch().then(() => {
       this.forecasts = this.forecastsStore.forecasts;
     });
+
+    window.addEventListener('click', (e) => {
+      if (!this.$refs["context-menu"].contains(e.target)){
+        this.closeContext();
+      }
+    })
   }
 }
 </script>
@@ -176,19 +183,18 @@ input {
 .context-menu {
   position: absolute;
   background: #dddddd;
-  width: 100%;
   left: 0;
-  margin-top: 10px;
-  z-index: 9999;
+  z-index: 9990;
   cursor: default;
-  padding-bottom: 10px;
+  width: 100px;
+  padding-left: 5px;
 }
 
 .context-menu__item {
   color: var(--color-text);
   cursor: pointer;
-  margin-top: 10px;
   position: relative;
+  margin-bottom: 5px;
 }
 
 .context-menu__item::before {
@@ -222,6 +228,16 @@ input {
 
 .forecast:hover {
   background: #cccccc;
+}
+
+.actions p{
+  transform: rotate(90deg);
+  font-size: 20px;
+  letter-spacing: 3px;
+}
+
+.context-menu {
+  outline: none;
 }
 
 </style>

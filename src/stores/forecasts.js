@@ -51,5 +51,8 @@ export const useForecastsStore = defineStore('forecasts', {
         return data;
       })
     },
+    async recalc(forecastsIds) {
+
+    },
   }
 })

@@ -2,6 +2,8 @@
   <table>
     <thead>
     <tr>
+      <th style="width:5%"><input type="checkbox" @click="checkAllWells()" :checked="chosenWells.length === formattedWells.length"></th>
+      <th style="width:8%" class="calc-button" @click="calc()">Рассчитать <svg v-if="load" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><radialGradient id="a6" cx=".66" fx=".66" cy=".3125" fy=".3125" gradientTransform="scale(1.5)"><stop offset="0" stop-color="#FFFFFF"></stop><stop offset=".3" stop-color="#FFFFFF" stop-opacity=".9"></stop><stop offset=".6" stop-color="#FFFFFF" stop-opacity=".6"></stop><stop offset=".8" stop-color="#FFFFFF" stop-opacity=".3"></stop><stop offset="1" stop-color="#FFFFFF" stop-opacity="0"></stop></radialGradient><circle transform-origin="center" fill="none" stroke="url(#a6)" stroke-width="15" stroke-linecap="round" stroke-dasharray="200 1000" stroke-dashoffset="0" cx="100" cy="100" r="70"><animateTransform type="rotate" attributeName="transform" calcMode="spline" dur="2" values="360;0" keyTimes="0;1" keySplines="0 0 1 1" repeatCount="indefinite"></animateTransform></circle><circle transform-origin="center" fill="none" opacity=".2" stroke="#FFFFFF" stroke-width="15" stroke-linecap="round" cx="100" cy="100" r="70"></circle></svg></th>
       <th>Дата ввода</th>
       <th>Стартовый дебит нефти</th>
       <th>Месторождение</th>
@@ -14,6 +16,8 @@
            name: `well`,
            params: {forecastId: forecastId, wellId: well.id},
          }">
+      <td><input type="checkbox" v-model="well.checked" @change="updateChosenWells()" @click.stop></td>
+      <td></td>
       <td>{{well.startDate}}</td>
       <td>{{well.startOil}}</td>
       <td>{{well.field}}</td>
@@ -53,6 +57,8 @@ export default {
       wells: [],
       showChartsModal: false,
       chosenWell: {},
+      chosenWells: [],
+      load: false,
     }
   },
   computed: {
@@ -65,7 +71,8 @@ export default {
           startOil: +well['СтартовыйДебитНефти'].toFixed(3),
           field: well['Месторождение'],
           startFluid: +well['СтартовыйДебитЖидкости'].toFixed(3),
-          number: well['НомерСкважины']
+          number: well['НомерСкважины'],
+          checked: false,
         })
       });
 
@@ -76,6 +83,31 @@ export default {
     showCharts(well) {
       this.chosenWell = well;
       this.showChartsModal = true;
+    },
+    checkAllWells() {
+      let checkedValue = true;
+      if (this.chosenWells.length === this.formattedWells.length) {
+        checkedValue = false;
+      }
+      this.formattedWells.map(well => {
+        well.checked = checkedValue;
+      })
+
+      this.updateChosenWells()
+    },
+    updateChosenWells() {
+      this.chosenWells = this.formattedWells.filter(well => well.checked);
+    },
+    calc() {
+      this.load = true;
+      const chosenWellsIds = this.chosenWells.map(item => item.id);
+      const calcPromise = this.wellsStore.calc(this.forecastId, chosenWellsIds);
+      const timeoutPromise = new Promise(resolve => setTimeout(resolve, 500));
+
+      Promise.all([calcPromise, timeoutPromise]).then(function () {
+        this.load = false;
+      }.bind(this));
+
     }
   },
   mounted() {
@@ -126,5 +158,24 @@ thead tr:hover {
 
 .well:last-child{
   border-bottom: none;
+}
+
+input {
+  cursor: pointer;
+  height: 100%;
+}
+
+.calc-button {
+  cursor: pointer;
+  transition: .5s;
+}
+.calc-button:hover {
+  background: #2371d1;
+}
+
+.calc-button svg {
+  width: 20px;
+  margin-bottom: -5px;
+  margin-left: 5px;
 }
 </style>
