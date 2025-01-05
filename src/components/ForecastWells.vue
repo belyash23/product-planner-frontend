@@ -34,7 +34,7 @@
     </RouterLink>
     </tbody>
   </table>
-  <a :href="blobUrl" ref="download-button"></a>
+  <a :href="blobUrl" ref="download-button" download="Выгрузка скважин.xlsx"></a>
 </template>
 
 <script>

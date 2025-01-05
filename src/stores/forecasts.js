@@ -51,8 +51,18 @@ export const useForecastsStore = defineStore('forecasts', {
         return data;
       })
     },
-    async recalc(forecastsIds) {
-
+    async importWells(forecastId, fileContent) {
+      const formData = new FormData();
+      formData.append('file', fileContent);
+      return fetch(`${import.meta.env.VITE_BACKEND_URL}/forecast/${forecastId}/uploadWellSchedule`, {
+        // headers: {
+        //   'Content-Type': undefined,
+        // },
+        method: 'POST',
+        body: formData,
+      }).then(response => {
+        return response.json();
+      });
     },
   }
 })

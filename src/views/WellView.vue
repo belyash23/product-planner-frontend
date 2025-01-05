@@ -11,7 +11,7 @@
       <div :class="{tab: true, active: activeTab === 'charts'}" @click="activeTab='charts'">Графики</div>
     </div>
     <WellCharts v-if="activeTab === 'charts'" :forecast-id="forecastId" :well-id="wellId" :indicators="data.indicators"></WellCharts>
-    <WellIndicators :data="data" :forecast-id="forecastId" :well-id="wellId"></WellIndicators>
+    <WellIndicators v-if="activeTab === 'indicators'" :data="data" :forecast-id="forecastId" :well-id="wellId"></WellIndicators>
   </main>
 </template>
 
