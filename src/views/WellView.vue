@@ -7,11 +7,11 @@
          }">
         <svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 122.88 108.06"><title>back-arrow</title><path d="M63.94,24.28a14.28,14.28,0,0,0-20.36-20L4.1,44.42a14.27,14.27,0,0,0,0,20l38.69,39.35a14.27,14.27,0,0,0,20.35-20L48.06,68.41l60.66-.29a14.27,14.27,0,1,0-.23-28.54l-59.85.28,15.3-15.58Z"/></svg>
       </RouterLink>
-      <div :class="{tab: true, active: activeTab === 'indicators'}" @click="activeTab='indicators'">Индикаторы</div>
-      <div :class="{tab: true, active: activeTab === 'charts'}" @click="activeTab='charts'">Графики</div>
+      <div :class="{tab: true, active: activeTab === 'indicators'}" @click="activeTab='indicators'">Атрибуты</div>
+      <div :class="{tab: true, active: activeTab === 'charts'}" @click="activeTab='charts'">Индикаторы</div>
     </div>
     <WellCharts v-if="activeTab === 'charts'" :forecast-id="forecastId" :well-id="wellId" :indicators="data.indicators"></WellCharts>
-    <WellIndicators v-if="activeTab === 'indicators'" :data="data" :forecast-id="forecastId" :well-id="wellId"></WellIndicators>
+    <WellIndicators v-if="activeTab === 'indicators'" :data="data" :forecast-id="forecastId" :well-id="wellId" @save="refreshWellsData"></WellIndicators>
   </main>
 </template>
 
@@ -31,6 +31,18 @@ export default {
     }
   },
   components: {WellIndicators, WellCharts},
+  methods: {
+    refreshWellsData()
+    {
+      this.wellsStore.getWellData(this.forecastId, this.wellId).then(() => {
+        this.wellsStore.wells[this.forecastId].forEach(well => {
+          if (well.DocumentId === this.wellId) {
+            this.data = well.data;
+          }
+        });
+      });
+    }
+  },
   created() {
     this.wellsStore.wells[this.forecastId].forEach(well => {
       if (well.DocumentId === this.wellId) {
@@ -38,13 +50,7 @@ export default {
       }
     });
 
-    this.wellsStore.getWellData(this.forecastId, this.wellId).then(() => {
-      this.wellsStore.wells[this.forecastId].forEach(well => {
-        if (well.DocumentId === this.wellId) {
-          this.data = well.data;
-        }
-      });
-    });
+    this.refreshWellsData();
   }
 }
 </script>

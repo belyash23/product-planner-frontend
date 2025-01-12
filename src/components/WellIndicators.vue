@@ -140,6 +140,7 @@ export default {
       if (responseData.status === 'OK') {
         await this.wellsStore.calc(this.forecastId, [this.wellId]);
         this.messageText = 'Индикаторы успешно сохранены';
+        this.$emit('save');
       } else {
         this.messageText = responseData.title;
       }
