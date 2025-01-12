@@ -66,6 +66,7 @@ export default {
       functionTypesMap: {
         'Harmonic': 'Гармоническая',
         'Exp': 'Экспоненциальная',
+        'Hyperbolic': 'Гиперболическая',
       },
       indicatorsToShowInBaseForm: ['ДатаВвода', 'СтартовыйДебитНефти', 'Месторождение', 'СтартовыйДебитЖидкости', 'НомерСкважины'],
       messageText: '',
@@ -137,6 +138,7 @@ export default {
       const responseData = await this.wellsStore.saveAttributes(this.forecastId, this.wellId, this.data.attributes);
 
       if (responseData.status === 'OK') {
+        await this.wellsStore.calc(this.forecastId, [this.wellId]);
         this.messageText = 'Индикаторы успешно сохранены';
       } else {
         this.messageText = responseData.title;
