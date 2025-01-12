@@ -62,6 +62,20 @@ export const useWellsStore = defineStore('wells', {
       });
     },
 
+    async remove(forecastId, wellsIds) {
+      return fetch(`${import.meta.env.VITE_BACKEND_URL}/forecast/${forecastId}/remove`, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        method: 'POST',
+        body: JSON.stringify({
+          documentsIds: wellsIds,
+        }),
+      }).then(response => {
+        return response.json();
+      });
+    },
+
     async getSchedule(forecastId, wellsIds) {
       return fetch(`${import.meta.env.VITE_BACKEND_URL}/export/wellSchedule`, {
         headers: {
