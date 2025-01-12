@@ -9,6 +9,7 @@
         <div class="context-menu" v-show="contextMenuOpened">
           <div class="context-menu__item" @click="calc()">Рассчитать</div>
           <div class="context-menu__item"  @click="download()">Выгрузить</div>
+          <div class="context-menu__item"  @click="remove()">Удалить</div>
         </div>
       </th>
 
@@ -109,6 +110,11 @@ export default {
       }.bind(this));
 
     },
+    async remove() {     
+      const chosenWellsIds = this.chosenWells.map(item => item.id);
+      await this.wellsStore.remove(this.forecastId, chosenWellsIds);      
+      this.fetchWells();
+    },
     download() {
       const chosenWellsIds = this.chosenWells.map(item => item.id);
       this.wellsStore.getSchedule(this.forecastId, chosenWellsIds).then(blob => {
@@ -116,6 +122,11 @@ export default {
         setTimeout(function () {
           this.$refs["download-button"].click();
         }.bind(this));
+      });
+    },
+    fetchWells() {
+      this.wellsStore.fetch(this.forecastId).then(()=>{
+        this.wells = this.wellsStore.wells[this.forecastId]
       });
     }
   },
