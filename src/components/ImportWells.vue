@@ -49,6 +49,7 @@
 
 <script>
 import {useForecastsStore} from "@/stores/forecasts";
+import {useWellsStore} from "@/stores/wells";
 
 export default {
   name: "ImportWells",
@@ -58,6 +59,7 @@ export default {
   data() {
     return {
       forecastsStore: useForecastsStore(),
+      wellsStore: useWellsStore(),
       showMessage: false,
       messageText: '',
       isDragging: false,
@@ -70,6 +72,7 @@ export default {
         this.forecastsStore.importWells(this.forecastId, this.files[0]).then(function (response) {
           if (response.status === 'OK') {
             this.messageText = 'Скважины успешно импортированы';
+            this.wellsStore.fetch(this.forecastId);
           } else {
             this.messageText = 'Ошибка, выберите другой файл';
           }

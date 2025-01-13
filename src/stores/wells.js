@@ -12,7 +12,10 @@ export const useWellsStore = defineStore('wells', {
       return fetch(`${import.meta.env.VITE_BACKEND_URL}/forecast/${forecastId}/wellObjects`).then(response => {
         return response.json();
       }).then(data => {
-        this.wells[forecastId] = data.data;
+        if (!this.wells[forecastId]) {
+          this.wells[forecastId] = [];
+        }
+        this.wells[forecastId].splice(0, this.wells[forecastId].length, ...data.data);
       });
     },
 
