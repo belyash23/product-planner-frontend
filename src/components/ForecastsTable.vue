@@ -57,7 +57,6 @@ export default {
       forecastsStore: useForecastsStore(),
       forecasts: [],
       showCopyModal: false,
-      chosenForecasts: [],
       chosenForecast: {},
       contextMenuOpened: false,
       contextMenuOpenedRecently: false,
@@ -74,12 +73,8 @@ export default {
         this.forecastsStore.delete(id);
       }
     },
-    updateChosenForecasts() {
-      this.chosenForecasts = this.preparedForecasts.filter(forecast => forecast.checked);
-    },
     showContext(forecastId, e)
     {
-      window.e = e;
       this.chosenForecast = this.preparedForecasts.filter(forecast => forecast.id === forecastId)[0];
       this.contextMenuOffsetX = e.clientX - 120 - 110;
       this.contextMenuOffsetY = e.clientY;
@@ -87,7 +82,6 @@ export default {
     },
     closeContext()
     {
-      this.chosenForecast = {}
       this.contextMenuOpened = false;
     },
   },
@@ -113,7 +107,7 @@ export default {
     });
 
     window.addEventListener('click', (e) => {
-      if (!this.$refs["context-menu"].contains(e.target)){
+      if (!this.$refs["context-menu"]?.contains(e.target)){
         this.closeContext();
       }
     })
