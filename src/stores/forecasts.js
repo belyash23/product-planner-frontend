@@ -15,12 +15,13 @@ export const useForecastsStore = defineStore('forecasts', {
         this.forecasts = data.data;
       });
     },
-    async copy(id, name) {
+    async copy(id, name, comment) {
       let newForecast = {}
       this.forecasts.forEach(forecast => {
         if (forecast.forecastId === id) {
           newForecast = Object.assign({}, forecast);
           newForecast.label = name;
+          newForecast.comment = comment;
           return fetch(`${import.meta.env.VITE_BACKEND_URL}/forecasts/${id}/copy`, {
             headers: {
               'Content-Type': 'application/json',

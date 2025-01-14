@@ -2,6 +2,8 @@
   <form class="copy-form">
     <label for="forecast-name">Название:</label>
     <input type="text" id="forecast-name" v-model="forecastName">
+    <label for="forecast-comment">Комментарий:</label>
+    <input type="text" id="forecast-comment" v-model="forecastComment">
     <input type="submit" value="Отправить" @click.stop.prevent="copy">
     <div class="message" v-if="showMessage">Прогноз успешно скопирован</div>
   </form>
@@ -19,12 +21,13 @@ export default {
     return {
       forecastsStore: useForecastsStore(),
       forecastName: '',
+      forecastComment: '',
       showMessage: false,
     }
   },
   methods: {
     copy() {
-      this.forecastsStore.copy(this.forecastId, this.forecastName).then(function () {
+      this.forecastsStore.copy(this.forecastId, this.forecastName, this.forecastComment).then(function () {
         this.showMessage = true;
       }.bind(this));
     }
